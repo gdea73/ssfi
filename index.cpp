@@ -1,5 +1,8 @@
 #include "ssfi.hpp"
-const int WAIT_TIME_MS = 200;
+#include <ctype.h>
+
+const int US_PER_MS = 1000;
+const int WAIT_TIME_MS = 100;
 
 static string dequeue_file(queue<string> &file_queue)
 {
@@ -24,7 +27,7 @@ static string dequeue_file(queue<string> &file_queue)
 			}
 			/* allow the search thread some time to populate the queue before checking again */
 			log_debug("waiting...");
-			usleep(1000 * WAIT_TIME_MS);
+			usleep(US_PER_MS * WAIT_TIME_MS);
 		}
 	}
 
@@ -50,6 +53,8 @@ static void index_line(const string &line)
 	for (std::sregex_iterator i = begin; i != end; i++) {
 		std::smatch match = *i;
 		string word = match.str();
+		/* convert words to their lowercase form to achieve case-insensitivity */
+		std::transform(word.begin(), word.end(), word.begin(), tolower);
 		index_word(word);
 	}
 }
@@ -71,6 +76,7 @@ static void index_file(const string &file)
 void *index_files(void *_)
 {
 	string file_path = "";
+	int files_indexed = 0;
 
 	log_debug("indexing...");
 
@@ -79,9 +85,12 @@ void *index_files(void *_)
 	while (!file_path.empty()) {
 		/* process this file */
 		index_file(file_path);
+		files_indexed++;
 		/* dequeue_file will write an empty string to file_path when the queue is depleted */
 		file_path = dequeue_file(gbl.file_queue);
 	}
+
+	log_debug("files_indexed: " + std::to_string(files_indexed));
 	
 	return NULL;
 }

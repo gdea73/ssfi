@@ -53,18 +53,13 @@ static bool search_recursive(const string &path, const regex &regex)
 				add_file_path_to_queue(path + "/" + filename);
 
 				gbl.file_queue_mutex.unlock();
-			} else {
-				// log_debug(filename + " doesn't match");
 			}
 		}
 	}
 
 	return files_discovered;
 
-	if (0 != closedir(dir)) {
-		cout << "Failed to close directory: " << path << "\n";
-		exit(1);
-	}
+	ensure(closedir, dir);
 }
 
 void search(const string &path, const string &extension_filter)

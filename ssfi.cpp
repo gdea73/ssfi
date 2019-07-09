@@ -141,7 +141,6 @@ int main(int argc, char **argv)
 	/* join all worker threads before processing the global index (map) */
 	for (int t = 0; t < gbl.n_threads; t++) {
 		ensure(pthread_join, threads[t], NULL);
-		log_debug("joined " + t);
 	}
 
 	print_summary();
