@@ -4,10 +4,11 @@ static string dequeue_file(queue<string> &file_queue)
 {
 	string file_path = "";
 
-	while (file_path.empty() && !gbl.search_complete) {
+	while (file_path.empty()) {
 		gbl.file_queue_mutex.lock();
 
 		/* critical section — global file queue */
+		log_debug("queue size " + std::to_string(file_queue.size()));
 		if (file_queue.size() > 0) {
 			file_path = file_queue.front();
 			file_queue.pop();
@@ -16,6 +17,10 @@ static string dequeue_file(queue<string> &file_queue)
 			gbl.file_queue_mutex.unlock();
 		} else {
 			gbl.file_queue_mutex.unlock();
+
+			if (gbl.search_complete) {
+				return file_path;
+			}
 			/* allow the search thread some time to populate the queue before checking again */
 			log_debug("waiting...");
 			usleep(100 * 5000);
@@ -65,7 +70,6 @@ static void index_file(const string &file)
 void *index_files(void *_)
 {
 	string file_path = "";
-	while (!gbl.search_complete);
 
 	log_debug("indexing...");
 

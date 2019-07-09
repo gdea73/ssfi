@@ -91,10 +91,10 @@ static void parse_args(int argc, char **argv, vector<string> &files)
 	gbl.search_path = path;
 }
 
-static void print_summary(const map<string, int> &index)
+static void print_summary()
 {
 	size_t rank = 1;
-	vector<pair<string, int>> flattened_index(index.begin(), index.end());
+	vector<pair<string, int>> flattened_index(gbl.index.begin(), gbl.index.end());
 	
 	std::sort(flattened_index.begin(), flattened_index.end(), [] (
 			const pair<string, int> &pair1,
@@ -105,7 +105,7 @@ static void print_summary(const map<string, int> &index)
 	);
 
 	while (rank <= N_SUMMARY_WORDS && rank <= flattened_index.size()) {
-		auto p = flattened_index[flattened_index.size() - (rank - 1)];
+		auto p = flattened_index[flattened_index.size() - rank];
 
 		string output = p.first + "\t" + std::to_string(p.second) + "\n";
 		cout << output;
@@ -144,5 +144,5 @@ int main(int argc, char **argv)
 		log_debug("joined " + t);
 	}
 
-	print_summary(gbl.index);
+	print_summary();
 }
