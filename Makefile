@@ -5,7 +5,7 @@ OBJECTS = \
 	ssfi.o \
 	index.o
 
-CXXFLAGS = -std=c++14 -Wall
+CXXFLAGS = -g -std=c++14 -Wall
 
 LINKER_OPTIONS = -lpthread
 

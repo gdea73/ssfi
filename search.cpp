@@ -54,7 +54,7 @@ static bool search_recursive(const string &path, const regex &regex)
 
 				gbl.file_queue_mutex.unlock();
 			} else {
-				log_debug(filename + " doesn't match");
+				// log_debug(filename + " doesn't match");
 			}
 		}
 	}
@@ -75,49 +75,4 @@ void search(const string &path, const string &extension_filter)
 		exit(1);
 	}
 	gbl.search_complete = true;
-
-#if 0
-	DIR *dir = opendir(path.c_str());
-	regex suffix_regex(".*\\." + extension_filter + "$");
-
-	if (NULL == dir) {
-		cout << "Failed to list contents of directory: " << path << "\n";
-	} else {
-		struct dirent *entry = NULL;
-		bool files_discovered = false;
-
-		while ((entry = readdir(dir))) {
-			string filename(entry->d_name);
-
-			/* check the extension filter before adding the entry to our list */
-			if (1 == matches(suffix_regex, filename)) {
-				if (!files_discovered) {
-					/* first file enqueued; we already have the mutex */
-					files_discovered = true;
-				} else {
-					gbl.file_queue_mutex.lock();
-				}
-
-				/* critical section — global file queue */
-				add_file_path_to_queue(path + "/" + filename);
-
-				gbl.file_queue_mutex.unlock();
-			} else {
-				log_debug(filename + " doesn't match");
-			}
-		}
-
-		if (!files_discovered) {
-			cout << "Discovered no files to index.\n";
-			exit(1);
-		}
-
-		gbl.search_complete = true;
-
-		if (0 != closedir(dir)) {
-			cout << "Failed to close directory: " << path << "\n";
-			exit(1);
-		}
-	}
-#endif
 }

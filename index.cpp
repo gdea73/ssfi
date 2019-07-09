@@ -17,7 +17,8 @@ static string dequeue_file(queue<string> &file_queue)
 		} else {
 			gbl.file_queue_mutex.unlock();
 			/* allow the search thread some time to populate the queue before checking again */
-			usleep(100 * 500);
+			log_debug("waiting...");
+			usleep(100 * 5000);
 		}
 	}
 
@@ -26,7 +27,12 @@ static string dequeue_file(queue<string> &file_queue)
 
 static void index_word(const string &word)
 {
+	gbl.index_mutex.lock();	
 
+	/* critical section — global index (map) */
+	gbl.index[word]++;
+
+	gbl.index_mutex.unlock();
 }
 
 static void index_line(const string &line)
@@ -36,7 +42,9 @@ static void index_line(const string &line)
 	std::sregex_iterator end = std::sregex_iterator();
 
 	for (std::sregex_iterator i = begin; i != end; i++) {
-		index_word((*i).str());
+		std::smatch match = *i;
+		string word = match.str();
+		index_word(word);
 	}
 }
 
@@ -57,6 +65,7 @@ static void index_file(const string &file)
 void *index_files(void *_)
 {
 	string file_path = "";
+	while (!gbl.search_complete);
 
 	log_debug("indexing...");
 

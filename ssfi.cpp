@@ -5,6 +5,7 @@ ssfi_gbl gbl = {};
 const string DEBUG_SWITCH = "-d";
 const string N_THREADS_SWITCH = "-t";
 const int DEFAULT_N_THREADS = 4;
+const int N_SUMMARY_WORDS = 10;
 const string TEXT_FILE_EXTENSION = "txt";
 
 void print_usage(const char *program_name)
@@ -90,6 +91,28 @@ static void parse_args(int argc, char **argv, vector<string> &files)
 	gbl.search_path = path;
 }
 
+static void print_summary(const map<string, int> &index)
+{
+	size_t rank = 1;
+	vector<pair<string, int>> flattened_index(index.begin(), index.end());
+	
+	std::sort(flattened_index.begin(), flattened_index.end(), [] (
+			const pair<string, int> &pair1,
+			const pair<string, int> &pair2
+		) {
+			return pair1.second < pair2.second;
+		}
+	);
+
+	while (rank <= N_SUMMARY_WORDS && rank <= flattened_index.size()) {
+		auto p = flattened_index[flattened_index.size() - (rank - 1)];
+
+		string output = p.first + "\t" + std::to_string(p.second) + "\n";
+		cout << output;
+		rank++;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	vector<string> files;
@@ -115,8 +138,11 @@ int main(int argc, char **argv)
 	 * thread will release the queue lock to allow worker threads to begin indexing. */
 	search(gbl.search_path, TEXT_FILE_EXTENSION);
 
-	/* join all worker threads before exiting from the main thread */
+	/* join all worker threads before processing the global index (map) */
 	for (int t = 0; t < gbl.n_threads; t++) {
 		ensure(pthread_join, threads[t], NULL);
+		log_debug("joined " + t);
 	}
+
+	print_summary(gbl.index);
 }

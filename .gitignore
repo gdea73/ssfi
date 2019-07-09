@@ -30,4 +30,7 @@
 *.exe
 *.out
 *.app
-./ssfi
+ssfi
+
+# stdout redirection
+output

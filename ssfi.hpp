@@ -30,6 +30,7 @@ using std::regex;
 using std::vector;
 using std::map;
 using std::queue;
+using std::pair;
 
 struct ssfi_gbl {
 	bool debug; /* enables debug logging, though stdout isn't written atomically */
