@@ -1,4 +1,5 @@
 #include "ssfi.hpp"
+const int WAIT_TIME_MS = 200;
 
 static string dequeue_file(queue<string> &file_queue)
 {
@@ -23,7 +24,7 @@ static string dequeue_file(queue<string> &file_queue)
 			}
 			/* allow the search thread some time to populate the queue before checking again */
 			log_debug("waiting...");
-			usleep(100 * 5000);
+			usleep(1000 * WAIT_TIME_MS);
 		}
 	}
 

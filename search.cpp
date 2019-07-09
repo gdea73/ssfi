@@ -13,14 +13,14 @@ bool is_dir(const string &path)
 }
 
 static void add_file_path_to_queue(const string &file_path) {
-	// log_debug("enqueuing: " + file_path);
+	log_debug("enqueuing: " + file_path);
 	gbl.file_queue.push(file_path);
 }
 
 static bool search_recursive(const string &path, const regex &regex)
 {
 	DIR *dir = opendir(path.c_str());
-	// log_debug("search_recursive: " + path);
+	log_debug("search_recursive: " + path);
 
 	if (NULL == dir) {
 		cout << "Failed to list contents of directory: " << path << "\n";
